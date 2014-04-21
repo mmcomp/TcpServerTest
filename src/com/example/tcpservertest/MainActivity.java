@@ -13,21 +13,23 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.AdapterView;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 
 
+@SuppressLint("SetJavaScriptEnabled")
 public class MainActivity extends Activity {
 	private ServerSocket serverSocket;
 	public static int clientCount = 100;
@@ -46,6 +48,8 @@ public class MainActivity extends Activity {
 	public static LinearLayout lin1;
 	Button settBtn;
 	Button callBtn;
+	WebView mywebview;
+
     /*public static String[] values = new String[] { "Android", "iPhone", "WindowsMobile",
         "Blackberry", "WebOS", "Ubuntu", "Windows7", "Max OS X",
         "Linux", "OS/2", "Ubuntu", "Windows7", "Max OS X", "Linux",
@@ -83,6 +87,7 @@ public class MainActivity extends Activity {
 	void createListView()
 	{
 
+	    /*
 	    final StableArrayAdapter adapter = new StableArrayAdapter(this,
 	        android.R.layout.simple_list_item_1, list);
 	    listview.setAdapter(adapter);
@@ -93,23 +98,10 @@ public class MainActivity extends Activity {
 	          int position, long id) {
 	        final String item = (String) parent.getItemAtPosition(position);
 	        Toast.makeText(getApplicationContext(), item, Toast.LENGTH_LONG).show();
-	        EditText ed1 = (EditText) findViewById(R.id.resNum);
-			ed1.setText(item);
-			
             adapter.notifyDataSetChanged();
-/*
-	        view.animate().setDuration(2000).alpha(0)
-	            .withEndAction(new Runnable() {
-	              @Override
-	              public void run() {
-	                list.remove(item);
-	                adapter.notifyDataSetChanged();
-	                view.setAlpha(1);
-	              }
-	            });
-*/
 	      }
 	    });
+	    */
 	}
 
 
@@ -119,13 +111,26 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		updateConversationHandler = new Handler();
 		setContentView(R.layout.activity_main);
+		mywebview = (WebView) findViewById(R.id.webview1);
+		WebSettings webSettings = mywebview.getSettings();
+		//Intent inten = getIntent();
+		//int kala_miniGroup_id = inten.getIntExtra("kala_miniGroup_id", -1);
+		mywebview.addJavascriptInterface(new ServerClass(this), "server");
+		webSettings.setJavaScriptEnabled(true);
+		mywebview.loadUrl("file:///android_asset/html/server.html");
+		if(android.os.Build.VERSION.SDK_INT==Build.VERSION_CODES.JELLY_BEAN)
+			fixPro();
+
+		/*
 	    listview = (ListView) findViewById(R.id.listview);
 	    list = new ArrayList<String>();
+	    */
 	    /*
 	    for (int i = 0; i < values.length; ++i)
 		      list.add(values[i]);
 		*/
-		createListView();
+		//createListView();
+		/*
 		settBtn = (Button)findViewById(R.id.reserve);
 		settBtn.setOnClickListener(new OnClickListener() {
 			@Override
@@ -164,8 +169,16 @@ public class MainActivity extends Activity {
 				Toast.makeText(getApplicationContext(), str, Toast.LENGTH_LONG).show();
 			}
 		});
+		*/
 		this.serverThread = new Thread(new ServerThread());
 		this.serverThread.start();
+	}
+	
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+	public void fixPro()
+	{
+		mywebview.getSettings().setAllowUniversalAccessFromFileURLs(true);
+		mywebview.getSettings().setAllowFileAccessFromFileURLs(true);
 	}
 	
 	void sendCommand(String comm,String sIp)
@@ -273,7 +286,7 @@ public class MainActivity extends Activity {
 			while (!Thread.currentThread().isInterrupted()) {
 
 				try {
-					String output = "NaN";
+//					String output = "NaN";
 					String read = input.readLine();
 					String cIp = clientSocket.getInetAddress().toString().replace("/", "");
 					DataOutputStream outToClient = new DataOutputStream(clientSocket.getOutputStream());
@@ -281,13 +294,13 @@ public class MainActivity extends Activity {
 					if(read!=null)
 					{
 						CommandClass cc = new CommandClass(read);
-						output = "isValid = "+String.valueOf(cc.isValid)+"\n";
+//						output = "isValid = "+String.valueOf(cc.isValid)+"\n";
 						if(cc.isValid)
 						{
 							//SERVER_IP = cIp;
 							Calendar cl = Calendar.getInstance();
-							output+="command = "+String.valueOf(cc.command)+"["+read+"]\n";
-							output += "err="+cc.data+"\n";
+//							output+="command = "+String.valueOf(cc.command)+"["+read+"]\n";
+//							output += "err="+cc.data+"\n";
 							switch (cc.command) {
 								case 7:
 									if(clientIndex < 0)
@@ -366,18 +379,21 @@ public class MainActivity extends Activity {
 			
 			if(msg!=null)
 			{
-				Toast.makeText(getApplicationContext(), cIp+":"+msg, Toast.LENGTH_SHORT).show();
+				//Toast.makeText(getApplicationContext(), cIp+":"+msg, Toast.LENGTH_SHORT).show();
 				str+=cIp+":'"+msg+"'\n";
 				if(msg=="added")
 				{
+					int clientIndex = ClientClass.ipExists(cIp, clientIps);
 					Toast.makeText(getApplicationContext(), "added "+cIp, Toast.LENGTH_SHORT).show();
+		            mywebview.loadUrl("javascript:addClient("+clientIndex+",'"+cIp+"');");
 				}
 				else if(msg == "Reserve")
 				{
 					int clientIndex = ClientClass.ipExists(cIp, clientIps);
-					Toast.makeText(getApplicationContext(), "reserve "+currentReserve, Toast.LENGTH_SHORT).show();
-		            list.add(String.valueOf(clientIps[clientIndex].reserveNumber));
-		            createListView();
+					//Toast.makeText(getApplicationContext(), "reserve "+currentReserve, Toast.LENGTH_SHORT).show();
+		            //list.add(String.valueOf(clientIps[clientIndex].reserveNumber));
+		            //createListView();
+		            mywebview.loadUrl("javascript:addReserve("+clientIndex+","+clientIps[clientIndex].reserveNumber+");");
 				}
 			}
 		}

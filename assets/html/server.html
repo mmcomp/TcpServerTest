@@ -1,0 +1,154 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<script src="../js/jquery-2.0.3.min.js"></script>
+		<script src="../js/jquery.mobile-1.3.1.min.js"></script>
+		<link rel="stylesheet" href="../css/jquery.mobile-1.3.1.min.css">
+		<script>
+			var clients=[];
+			$(document).ready(function(){
+			});
+			function readyToGo()
+			{
+				if(typeof server!='undefined')
+				{
+					if(parseInt($("#parvande_shomare").val(),10)>0)
+					{
+						server.setReserve($("#parvande_shomare").val());
+						//$("#msg_log").html('اطلاعات ارسال گردید');
+						$("#parvande_shomare").html('');
+						setActiveImg('on');
+					}
+					else
+					{
+						$("#msg_log").html('شماره پرونده‌ی معتبر وارد کنید');
+					}
+				}
+				else
+					alert('شما آندروید نیستید');
+			}
+			function addClient(id,ip)
+			{
+				var bool = true;
+				for(var j=0;j<clients.length;j++)
+				{
+					if(clients[j].id == id)
+						bool=false;
+				}
+				if(bool)
+				{
+					tmp = {'id':id,'ip':ip};
+					clients.push(tmp);
+				}
+			}
+			function addReserve(id,reserve_id)
+			{
+				var tt= '';
+				//$("#msg_log").html('یکی از کلاینت ها آماده تحویل به مشتری است id=>'+id+'reserve_id=>'+reserve_id);
+				$("#parvande_shomare").val('');
+				setActiveImg('off');
+				tt+='<button onclick="call_client(\''+id+'\','+reserve_id+');" class="client_class" id="reserved_'+id+'" > شماره پرونده:'+reserve_id+'</button>';
+				$("#wait_div").html(tt+$("#wait_div").html());
+				$(".client_class").buttonMarkup({theme: "e"});
+				$(".client_class").css('width','95%');
+			}
+			function call_client(id,reserve_id)
+			{
+				if(typeof server!='undefined')
+				{
+					server.call(id);
+					var tmp ='';
+					$("#reserved_"+id).remove();
+					tmp+='<button  class="client_class_reserve"  id="reserved_ready_'+id+'" onclick="remove_blink(\''+id+'\');" > شماره پرونده:'+reserve_id+'</button>';
+					$("#online_ready").html(tmp+$("#online_ready").html());
+					$(".client_class_reserve").buttonMarkup({theme: "b"});
+					$(".client_class_reserve").css('width','95%');
+					$(".client_class_reserve").effect("highlight", {}, 1000);
+				}
+				else
+					alert('شما آندروید نیستید');
+			}
+			function remove_blink(id)
+			{
+				$("#reserved_ready_"+id).remove();
+				if(typeof server!='undefined')
+				{
+					server.reset(id);
+					//$("#msg_log").html('یکی از کلاینت ها ریست گردید');
+				}
+			}
+			function setActiveImg(inp)
+			{
+				if(inp=='on')
+					$("#lamp").prop("src","../img/activePage.png");
+				else if(inp=='off')
+					$("#lamp").prop("src","../img/deactivePage.png");
+			}
+		</script>
+		<style>
+			.up_gradian{
+				padding:5px;
+				text-align:center;
+				/* IE10 Consumer Preview */ 
+				background-image: -ms-linear-gradient(bottom, #f1f1f1 0%, #BBBBBB 100%);
+
+				/* Mozilla Firefox */ 
+				background-image: -moz-linear-gradient(bottom, #f1f1f1 0%, #BBBBBB 100%);
+
+				/* Opera */ 
+				background-image: -o-linear-gradient(bottom, #f1f1f1 0%, #BBBBBB 100%);
+
+				/* Webkit (Safari/Chrome 10) */ 
+				background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #FFFFFF), color-stop(1, #BBBBBB));
+
+				/* Webkit (Chrome 11+) */ 
+				background-image: -webkit-linear-gradient(bottom, #f1f1f1 0%, #BBBBBB 100%);
+
+				/* W3C Markup, IE10 Release Preview */ 
+				background-image: linear-gradient(to top, #f1f1f1 0%, #BBBBBB 100%);
+				-webkit-border-top-left-radius: 15px;
+				-webkit-border-top-right-radius: 15px;
+				-moz-border-radius-topleft: 15px;
+				-moz-border-radius-topright: 15px;
+				border-top-left-radius: 15px;
+				border-top-right-radius: 15px;
+			}
+		</style>
+	</head>
+	<body dir="rtl" >
+		<div style="color:#ffffff;background:#333333;padding:5px;text-align:center;" >
+			گروه مهندسی آرتان
+		</div>
+		<table style="width:100%;" >
+			<tr>
+				<td style="width:10%" >
+				شماره پرونده:
+				</td>
+				<td id="parvande_td" >
+					<input type="number" id="parvande_shomare" >
+				</td>
+				<td style="width:5%">
+					<img id="lamp" src="../img/deactivePage.png" >
+				</td>
+				<td style="width:50%" >
+					<button data-theme="b" onclick="readyToGo();" >آماده برای تحویل</button>
+				</td>
+			</tr/>
+		</table>
+		<div id="ready_div" style="width:49%;float:right;" >
+			<div  style="margin-right:5px;" class="up_gradian" >
+				در حال انتظار
+			</div>
+			<div id="wait_div" ></div>
+		</div>
+		<div id="online_div" style="width:49%;float:left;" >
+			<div style="margin-left:5px;" class="up_gradian" >
+				تحویل داده شده
+			</div>
+			<div id="online_ready">
+			</div>
+		</div>
+		<div id="msg_log" style="width:100%" >
+		</div>
+	</body>
+</html>

@@ -8,24 +8,19 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" 
     android:id="@+id/rl1">
-
+     <WebView
+        android:id="@+id/webview1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true" />
+     <!--
     <Button
         android:id="@+id/reserve"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:text="Reserve" />
-<!-- 
-    <EditText
-        android:id="@+id/resNum"
-        android:inputType="text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/call"
-        android:layout_centerHorizontal="true"
-        android:ems="10" />
- --> 
- 
+        android:text="Reserve" /> 
     <ListView
         android:id="@+id/listview"
         android:layout_width="wrap_content"
@@ -75,5 +70,5 @@
         android:layout_alignBottom="@+id/log"
         android:layout_alignLeft="@+id/reserve"
         android:text="Update" />
-    
+    -->
 </RelativeLayout>
