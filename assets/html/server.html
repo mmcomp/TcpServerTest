@@ -39,7 +39,13 @@
 				{
 					tmp = {'id':id,'ip':ip};
 					clients.push(tmp);
+					$("#msg_log").html("ready:"+ip);
 				}
+			}
+			function update_clients()
+			{
+				for(var i=0;i<clients.length;i++)
+					server.update(clients[i].ip);
 			}
 			function addReserve(id,reserve_id)
 			{
@@ -84,6 +90,11 @@
 				else if(inp=='off')
 					$("#lamp").prop("src","../img/deactivePage.png");
 			}
+			function show_log()
+			{
+				$("#msg_log").html("لاگ:"+server.showLog());
+			}
+
 		</script>
 		<style>
 			.up_gradian{
@@ -148,6 +159,7 @@
 			<div id="online_ready">
 			</div>
 		</div>
+		<button data-theme="b" onclick="update_clients();" >بروز رسانی کلاینت‌ها</button>
 		<div id="msg_log" style="width:100%" >
 		</div>
 	</body>

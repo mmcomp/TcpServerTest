@@ -40,12 +40,13 @@ public class MainActivity extends Activity {
 	public static String str = "";
 	public static String serverId = "100";
 	public static int selectedClientId = -1;
-	public static String updateSequence = "0#http://192.168.1.3/a.mp4|1#http://192.168.1.3/b.mp4|2#http://192.168.1.3/c.mp4";
+	public static String updateSequence = "0#http://192.168.1.2/a.mp4#3|1#http://192.168.1.2/b.mp4#3|2#http://192.168.1.2/c.mp4#3";
 	Socket socket;
 	Handler updateConversationHandler;
 	Thread serverThread = null;
 	public static final int SERVERPORT = 6000;
 	public static LinearLayout lin1;
+	public static 
 	Button settBtn;
 	Button callBtn;
 	WebView mywebview;
@@ -301,6 +302,7 @@ public class MainActivity extends Activity {
 							Calendar cl = Calendar.getInstance();
 //							output+="command = "+String.valueOf(cc.command)+"["+read+"]\n";
 //							output += "err="+cc.data+"\n";
+							str += "command = "+String.valueOf(cc.command)+"["+read+"]\n";
 							switch (cc.command) {
 								case 7:
 									if(clientIndex < 0)
@@ -309,6 +311,7 @@ public class MainActivity extends Activity {
 										String dt = String.valueOf(cl.get(Calendar.YEAR))+"-"+String.valueOf(cl.get(Calendar.MONTH)+1)+"-"+String.valueOf(cl.get(Calendar.DAY_OF_MONTH))+" "+String.valueOf(cl.get(Calendar.HOUR_OF_DAY))+":"+String.valueOf(cl.get(Calendar.MINUTE))+":"+String.valueOf(cl.get(Calendar.SECOND));
 										clientIps[tmpId]  = new ClientClass(tmpId, cIp, dt, true, 0);
 										read = "added";
+										str += read+" "+cIp+"\n";
 										outToClient.writeChars(read);
 									}
 									else
@@ -384,7 +387,7 @@ public class MainActivity extends Activity {
 				if(msg=="added")
 				{
 					int clientIndex = ClientClass.ipExists(cIp, clientIps);
-					Toast.makeText(getApplicationContext(), "added "+cIp, Toast.LENGTH_SHORT).show();
+					//Toast.makeText(getApplicationContext(), "added "+cIp, Toast.LENGTH_SHORT).show();
 		            mywebview.loadUrl("javascript:addClient("+clientIndex+",'"+cIp+"');");
 				}
 				else if(msg == "Reserve")
@@ -451,13 +454,15 @@ public class MainActivity extends Activity {
 	}
 	void updateCommand(String cIp)
 	{
+		/*
+		cIp = cIp.trim();
 		try {
 			int clientIndex = ClientClass.ipExists(cIp, clientIps);
 			if(clientIndex>=0)
 			{
 				clientIps[clientIndex].reserveNumber = 0;
 				String comm= serverId+",4,"+updateSequence;
-				Toast.makeText(getApplicationContext(), "update command to "+cIp, Toast.LENGTH_SHORT).show();
+				Toast.makeText(getApplicationContext(), "update command to "+cIp+"\n"+comm, Toast.LENGTH_SHORT).show();
 				sendCommand(comm, cIp);
 			}
 			else if(clientIndex<0)
@@ -465,6 +470,15 @@ public class MainActivity extends Activity {
 		} catch (Exception e) {
 			Toast.makeText(getApplicationContext(), "error:"+e.getMessage(), Toast.LENGTH_SHORT).show();
 		}
+		*/
+		try {
+			String comm= serverId+",4,"+updateSequence;
+			sendCommand(comm, cIp);
+			callReserve = 0;
+		} catch (Exception e) {
+			Toast.makeText(getApplicationContext(), "error:"+e.getMessage(), Toast.LENGTH_SHORT).show();
+		}
+
 	}
 	
 }

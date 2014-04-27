@@ -58,7 +58,20 @@ public class ServerClass {
 		MainActivity.callReserve = MainActivity.clientIps[Integer.parseInt(clientIndex)].reserveNumber;
 		m.resetCommand(MainActivity.clientIps[Integer.parseInt(clientIndex)].ip);
 	}
+
+	@JavascriptInterface
+	public void update(String cIp)
+	{
+		MainActivity m = (MainActivity)mContext;
+		m.updateCommand(cIp);
+		//m.callCommand(cIp);
+	}
 	
+	@JavascriptInterface
+	public String showLog()
+	{
+		return MainActivity.str;
+	}
 	//-------------------------AJAX--------------------------------------------------
     @JavascriptInterface
     public String getAjax(String url,String jscript)
